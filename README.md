@@ -1,5 +1,7 @@
 # NFT Marketplace
 
+Solidity And React - Truffle + Web3 for NFTs (Non-Fungible-Tokens) - Blockchain
+
 Please run npm install on the terminal to download the appropriate packages already defined to the package.json file.
 Make sure you are in the source file.
 
