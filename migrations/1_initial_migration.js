@@ -1,5 +1,5 @@
-const Contracts = artifacts.require("Brazukas");
+const Migrations = artifacts.require("Migrations");
 
 module.exports = function (deployer) {
-  deployer.deploy(Contracts);
+  deployer.deploy(Migrations);
 };
