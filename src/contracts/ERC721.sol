@@ -2,10 +2,16 @@
 pragma solidity ^0.8.0;
 
 contract ERC721 {
-    // token ID to owner
+    event Transfer(
+        address indexed from,
+        address indexed to,
+        uint256 indexed tokenId
+    );
+
+    // token ID => owner
     mapping(uint256 => address) private _tokenOwner;
 
-    // owner to how many tokens owned
+    // owner => how many tokens owned
     mapping(address => uint256) private _ownedTokensCount;
 
     function _exists(uint256 tokenId) internal view returns (bool) {
@@ -19,6 +25,8 @@ contract ERC721 {
 
         _tokenOwner[tokenId] = receiver;
         _ownedTokensCount[receiver] += 1;
+
+        emit Transfer(address(0), receiver, tokenId);
     }
 
     constructor() {}
