@@ -1,12 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.9;
 
-contract Brazukas {
-    string public name;
-    string public symbol;
+import "./ERC721Connector.sol";
 
-    constructor() {
-        name = "Brazukas";
-        symbol = "BZKS";
-    }
+contract Brazukas is ERC721Connector {
+    constructor() ERC721Connector("Brazukas", "BZKS") {}
 }
