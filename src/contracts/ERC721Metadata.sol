@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.9;
+pragma solidity ^0.8.0;
 
 contract ERC721Metadata {
     string private _name;
@@ -10,11 +10,11 @@ contract ERC721Metadata {
         _symbol = symbolified;
     }
 
-    function name() external returns (string memory) {
+    function name() external view returns (string memory) {
         return _name;
     }
 
-    function symbol() external returns (string memory) {
+    function symbol() external view returns (string memory) {
         return _symbol;
     }
 }
