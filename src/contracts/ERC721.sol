@@ -8,11 +8,20 @@ contract ERC721 {
         uint256 indexed tokenId
     );
 
+    event Approval(
+        address indexed owner,
+        address indexed approved,
+        uint256 indexed tokenId
+    );
+
     // token ID => owner
     mapping(uint256 => address) private _tokenOwner;
 
     // owner => how many tokens owned
     mapping(address => uint256) private _ownedTokensCount;
+
+    // token ID => approved address
+    mapping(uint256 => address) private _tokenApprovals;
 
     function _exists(uint256 tokenId) internal view returns (bool) {
         address owner = _tokenOwner[tokenId];
@@ -72,5 +81,20 @@ contract ERC721 {
         _transferFrom(_from, _to, _tokenId);
     }
 
-    constructor() {}
+    // 1. Require that the person who is approving is th owner
+    // 2. We want approve an address to a token
+    // 3. Require that we cant approve sending tokens of the owner to the owner
+    // (current caller)
+    // 4. update tha map of the approvals
+    function approve(address _to, uint256 _tokenId) public {
+        address owner = ownerOf(_tokenId);
+        require(_to != owner, "ERC721: error aproving to current owner");
+        require(
+            msg.sender == owner,
+            "ERC721: current caller is not the owner of the token"
+        );
+        _tokenApprovals[_tokenId] = _to;
+
+        emit Approval(owner, _to, _tokenId);
+    }
 }
