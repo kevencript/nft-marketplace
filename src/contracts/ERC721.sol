@@ -29,18 +29,47 @@ contract ERC721 {
         emit Transfer(address(0), receiver, tokenId);
     }
 
-    function balanceOf(address _owner) external view returns (uint256) {
+    function balanceOf(address _owner) public view returns (uint256) {
         require(_owner != address(0));
         return _ownedTokensCount[_owner];
     }
 
-    function ownerOf(uint256 _id) external view returns (address) {
+    function ownerOf(uint256 _id) public view returns (address) {
         address owner = _tokenOwner[_id];
         require(
             owner != address(0),
             "ERC721: owner query for non-existing token"
         );
         return owner;
+    }
+
+    function _transferFrom(
+        address _from,
+        address _to,
+        uint256 _tokenId
+    ) internal {
+        require(
+            _to != address(0),
+            "ERC721: error while transfering to zero address"
+        );
+        require(
+            ownerOf(_tokenId) == _from,
+            "ERC721: token not owned or do not exist"
+        );
+
+        _ownedTokensCount[_from] -= 1;
+        _ownedTokensCount[_to] += 1;
+        _tokenOwner[_tokenId] = _to;
+
+        emit Transfer(_from, _to, _tokenId);
+    }
+
+    function transferFrom(
+        address _from,
+        address _to,
+        uint256 _tokenId
+    ) public {
+        _transferFrom(_from, _to, _tokenId);
     }
 
     constructor() {}
