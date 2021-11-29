@@ -14,6 +14,12 @@ contract ERC721 {
         uint256 indexed tokenId
     );
 
+    event ApprovalForAll(
+        address indexed owner,
+        address indexed operator,
+        bool indexed approved
+    );
+
     // token ID => owner
     mapping(uint256 => address) private _tokenOwner;
 
@@ -22,6 +28,9 @@ contract ERC721 {
 
     // token ID => approved address
     mapping(uint256 => address) private _tokenApprovals;
+
+    // owner => mapping of operator approvals
+    mapping(address => mapping(address => bool)) private _operatorApprovals;
 
     function _exists(uint256 tokenId) internal view returns (bool) {
         address owner = _tokenOwner[tokenId];
@@ -81,20 +90,31 @@ contract ERC721 {
         _transferFrom(_from, _to, _tokenId);
     }
 
-    // 1. Require that the person who is approving is th owner
-    // 2. We want approve an address to a token
-    // 3. Require that we cant approve sending tokens of the owner to the owner
-    // (current caller)
-    // 4. update tha map of the approvals
     function approve(address _to, uint256 _tokenId) public {
         address owner = ownerOf(_tokenId);
         require(_to != owner, "ERC721: error aproving to current owner");
         require(
-            msg.sender == owner,
-            "ERC721: current caller is not the owner of the token"
+            msg.sender == owner || isApprovedForAll(owner, msg.sender),
+            "ERC721: current caller is not the owner or not approved for all"
         );
-        _tokenApprovals[_tokenId] = _to;
 
+        _tokenApprovals[_tokenId] = _to;
         emit Approval(owner, _to, _tokenId);
+    }
+
+    function isApprovedForAll(address owner, address operator)
+        public
+        view
+        returns (bool)
+    {
+        return _operatorApprovals[owner][operator];
+    }
+
+    function setApprovalForAll(address operator, bool approved) public {
+        require(msg.sender != operator, "ERC721: approve to caller");
+        require(operator != address(0), "ERC721: operator have zero address");
+
+        _operatorApprovals[msg.sender][operator] = approved;
+        emit ApprovalForAll(msg.sender, operator, approved);
     }
 }
