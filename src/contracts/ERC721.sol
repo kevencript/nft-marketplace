@@ -47,20 +47,6 @@ contract ERC721 {
         emit Transfer(address(0), receiver, tokenId);
     }
 
-    function balanceOf(address _owner) public view returns (uint256) {
-        require(_owner != address(0));
-        return _ownedTokensCount[_owner];
-    }
-
-    function ownerOf(uint256 _id) public view returns (address) {
-        address owner = _tokenOwner[_id];
-        require(
-            owner != address(0),
-            "ERC721: owner query for non-existing token"
-        );
-        return owner;
-    }
-
     function _transferFrom(
         address _from,
         address _to,
@@ -82,11 +68,42 @@ contract ERC721 {
         emit Transfer(_from, _to, _tokenId);
     }
 
+    function _isApprovedOrOwner(address spender, uint256 tokenId)
+        internal
+        view
+        returns (bool)
+    {
+        require(
+            _exists(tokenId),
+            "ERC721: operator query for nonexistent token"
+        );
+
+        address owner = ownerOf(tokenId);
+        return (owner == spender ||
+            getApproved(tokenId) == spender ||
+            isApprovedForAll(owner, spender));
+    }
+
+    function balanceOf(address _owner) public view returns (uint256) {
+        require(_owner != address(0));
+        return _ownedTokensCount[_owner];
+    }
+
+    function ownerOf(uint256 _id) public view returns (address) {
+        address owner = _tokenOwner[_id];
+        require(
+            owner != address(0),
+            "ERC721: owner query for non-existing token"
+        );
+        return owner;
+    }
+
     function transferFrom(
         address _from,
         address _to,
         uint256 _tokenId
     ) public {
+        require(_isApprovedOrOwner(msg.sender, _tokenId));
         _transferFrom(_from, _to, _tokenId);
     }
 
@@ -116,5 +133,14 @@ contract ERC721 {
 
         _operatorApprovals[msg.sender][operator] = approved;
         emit ApprovalForAll(msg.sender, operator, approved);
+    }
+
+    function getApproved(uint256 tokenId) public view returns (address) {
+        require(
+            _exists(tokenId),
+            "ERC721: approved query for nonexistent token"
+        );
+
+        return _tokenApprovals[tokenId];
     }
 }
