@@ -23,6 +23,38 @@ contract ERC721Enumerable is ERC721 {
         _addTokensToOwnerEnumeration(receiver, tokenId);
     }
 
+    function transferFrom(
+        address _from,
+        address _to,
+        uint256 _tokenId
+    ) public override(ERC721) {
+        super.transferFrom(_from, _to, _tokenId);
+        _transferTokensToOwnerEnumeration(_from, _to, _tokenId);
+    }
+
+    function _transferTokensToOwnerEnumeration(
+        address _from,
+        address _to,
+        uint256 _tokenId
+    ) internal {
+        _removeTokensToOwnerEnumeration(_from, _tokenId);
+        _addTokensToOwnerEnumeration(_to, _tokenId);
+    }
+
+    function _removeTokensToOwnerEnumeration(address _from, uint256 _tokenId)
+        internal
+    {
+        uint256 index = _ownedTokensIndex[_tokenId];
+
+        // Defining specifig index as the last of array
+        _ownedTokens[_from][index] = _ownedTokens[_from][
+            _ownedTokens[_from].length - 1
+        ];
+        _ownedTokens[_from].pop();
+
+        delete _ownedTokensIndex[_tokenId];
+    }
+
     function _addTokensToAllTokensEnumeration(uint256 tokenId) private {
         _allTokensIndex[tokenId] = _allTokens.length;
         _allTokens.push(tokenId);
