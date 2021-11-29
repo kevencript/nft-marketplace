@@ -102,7 +102,7 @@ contract ERC721 {
         address _from,
         address _to,
         uint256 _tokenId
-    ) public {
+    ) public virtual {
         require(_isApprovedOrOwner(msg.sender, _tokenId));
         _transferFrom(_from, _to, _tokenId);
     }
