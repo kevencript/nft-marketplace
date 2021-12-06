@@ -20,7 +20,7 @@ contract ERC165 is IERC165 {
         return _supportedInterfaces[interfaceId];
     }
 
-    function _registerInterface(bytes4 interfaceId) private pure {
+    function _registerInterface(bytes4 interfaceId) internal pure {
         require(interfaceId != 0xffffffff, "ERC165: Invalid interface request");
     }
 }
