@@ -1,8 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
-import "./ERC721.sol";
 
-contract ERC721Enumerable is ERC721 {
+import "./ERC721.sol";
+import "./interfaces/IERC721Enumerable.sol";
+
+contract ERC721Enumerable is IERC721Enumerable, ERC721 {
     uint256[] private _allTokens;
 
     // tokenId => index in _allTokens array
@@ -13,6 +15,15 @@ contract ERC721Enumerable is ERC721 {
 
     // tokenId  => index of the owner tokens ids
     mapping(uint256 => uint256) private _ownedTokensIndex;
+
+    constructor() {
+        bytes4 interfaceIds = bytes4(
+            keccak256("totalSupply(bytes4)") ^
+                keccak256("tokenByIndex(bytes4)") ^
+                keccak256("tokenOfOwnerByIndex(bytes4)")
+        );
+        _registerInterface(interfaceIds);
+    }
 
     function _mint(address receiver, uint256 tokenId)
         internal
