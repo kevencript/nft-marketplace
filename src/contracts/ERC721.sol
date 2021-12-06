@@ -2,26 +2,9 @@
 pragma solidity ^0.8.0;
 
 import "./ERC165.sol";
+import "./interfaces/IERC721.sol";
 
-contract ERC721 is ERC165 {
-    event Transfer(
-        address indexed from,
-        address indexed to,
-        uint256 indexed tokenId
-    );
-
-    event Approval(
-        address indexed owner,
-        address indexed approved,
-        uint256 indexed tokenId
-    );
-
-    event ApprovalForAll(
-        address indexed owner,
-        address indexed operator,
-        bool indexed approved
-    );
-
+contract ERC721 is ERC165, IERC721 {
     // token ID => owner
     mapping(uint256 => address) private _tokenOwner;
 
@@ -104,12 +87,12 @@ contract ERC721 is ERC165 {
         address _from,
         address _to,
         uint256 _tokenId
-    ) public virtual {
+    ) public virtual override {
         require(_isApprovedOrOwner(msg.sender, _tokenId));
         _transferFrom(_from, _to, _tokenId);
     }
 
-    function approve(address _to, uint256 _tokenId) public {
+    function approve(address _to, uint256 _tokenId) public override {
         address owner = ownerOf(_tokenId);
         require(_to != owner, "ERC721: error aproving to current owner");
         require(
