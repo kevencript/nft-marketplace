@@ -9,11 +9,14 @@ require("chai")
     ).should()
 
 contract('Brazukas', async (account) => {
+    
     let contract
+    before(async () => {
+        contract = await Brazukas.deployed()
+    })
 
     describe("deployment", async () => {
         it("deploys successfully", async() => {
-            contract = await Brazukas.deployed()
             const address = contract.address
 
             assert.notEqual(address, '')
@@ -33,7 +36,7 @@ contract('Brazukas', async (account) => {
         })
 
         it("minting succesfully", async () => {
-            const nftName = "_test"
+            const nftName = "_test1"
             const result = await contract.mint(nftName)
             const event = result.logs[0].args
             const totalSupply = await contract.totalSupply()
@@ -45,7 +48,24 @@ contract('Brazukas', async (account) => {
             // Failure
             await contract.mint(nftName).should.be.rejected;
         })
+    })
 
+    describe("indexing", async () => {
+        it("list Brazukas", async () => {
+            await contract.mint("_test2")
+            await contract.mint("_test3")
+            await contract.mint("_test4")
+            const totalSupply = await contract.totalSupply()
+            const returned = []
 
+            for(i=0; i < totalSupply; i++) {
+                const returnedBrazuka = await contract.BrazukasArray(i)
+                returned.push(returnedBrazuka)
+            }
+
+            const expected = ["_test1","_test2","_test3","_test4"]
+
+            assert.equal(returned.join(","), expected.join(","))            
+        })
     })
 })
