@@ -108,7 +108,36 @@ class App extends Component {
                     </div>
                 </nav>
 
-                <h1>We are Doing a log!</h1>
+                <div className="containers mt-5">
+
+                    <div className="row">
+                        <div className="col-12 center-block">
+                            <center>    
+                                <h1 className="mb-2">Mint New NFT</h1>
+                                <form className="col-md-8 col-lg-6 text-left" onSubmit={(event) => {
+                                    event.preventDefault()
+                                    const brazuka = this.brazuka.value
+                                    this.mint(brazuka)
+                                }}>
+                                    <div className="form-group">
+                                        <label htmlFor="exampleInputEmail1">NFT Path:</label>
+                                        <input ref={(input) => {
+                                            this.brazuka = input
+                                        }} type="text" className="form-control" id="nftPath" aria-describedby="nftHelper" placeholder="Add the file location (Ex: /files/Brazukas)"></input>
+                                        <small id="emailHelp" className="form-text text-muted text-center">Metamesk must be connected for minting new NFT's</small>
+                                    </div>
+
+                                    <center>
+                                        <button type="submit" className="btn btn-primary col-md-7 col-sm-12">Submit</button>
+                                    </center>
+
+
+                                </form>
+                            </center>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         )
     }  
