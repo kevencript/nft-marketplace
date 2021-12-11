@@ -8,6 +8,7 @@ class App extends Component {
 
     async componentDidMount(){
         await this.loadWeb3()
+        await this.loadBlochainData()
     }
 
     async loadWeb3() {
@@ -18,6 +19,11 @@ class App extends Component {
         } else {
             console.log("No Ethereum wallet connected.")
         }
+    }
+
+    async loadBlochainData(){
+        const accounts = await window.web3.eth.getAccounts()
+        console.log(accounts)
     }
 
     render() {
