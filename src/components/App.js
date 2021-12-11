@@ -31,7 +31,7 @@ class App extends Component {
         const networkData = Brazukas.networks[networkId]
 
         this.setState({
-            account: accounts,
+            account: accounts[0],
         })
 
         if(networkData) {
@@ -57,6 +57,16 @@ class App extends Component {
 
     async isWalletConnected(){
         return this.state.isWalletConnected
+    }
+
+    mint = async (brazuka) => {
+        await this.state.contract.methods.mint(brazuka).send({
+            from: this.state.account
+        }).once('receipt', (receipt) => {
+            this.setState({
+                brazukas: [...this.state.brazukas, brazuka]
+            })
+        })
     }
 
     constructor(props){
