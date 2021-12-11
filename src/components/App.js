@@ -5,7 +5,16 @@ import detectEthereumProvider from "@metamask/detect-provider";
 import Brazukas from "../abis/Brazukas.json"
 
 class App extends Component {
-
+    constructor(props){
+        super(props)
+        this.state = {
+            account: '',
+            isWalletConnected: false,
+            totalSupply: 0,
+            contract: null,
+            brazukas: []
+        }
+    }
     async componentDidMount(){
         await this.loadWeb3()
         await this.loadBlochainData()
@@ -23,7 +32,10 @@ class App extends Component {
     }
 
     async loadBlochainData(){
-        if(!await this.isWalletConnected()) return
+        if(!await this.isWalletConnected()) {
+            alert("🦊 MetaMask must be connected to this functionality works!")
+            return
+        } 
         
         const web3 = window.web3
         const accounts = await web3.eth.getAccounts()
@@ -60,24 +72,29 @@ class App extends Component {
     }
 
     mint = async (brazuka) => {
-        await this.state.contract.methods.mint(brazuka).send({
+        if(!this.state.account) {
+            alert("You can't mint without been logged on MetaMask 🦊")
+            return
+        }
+
+        const callback = await this.state.contract.methods.mint(brazuka).send({
             from: this.state.account
-        }).once('receipt', (receipt) => {
-            this.setState({
-                brazukas: [...this.state.brazukas, brazuka]
-            })
+        }, (error, hash) => {
+            if(!error) {
+                alert("NFT '"+brazuka+"' successfully minted!")
+                this.setState({
+                    brazukas: [...this.state.brazukas, brazuka]
+                })
+            }
+
+            
         })
     }
 
-    constructor(props){
-        super(props)
-        this.state = {
-            account: '',
-            isWalletConnected: false,
-            totalSupply: 0,
-            contract: null,
-            brazukas: []
-        }
+    handleSubmit = (event) => {
+        event.preventDefault()
+        const brazuka = this.brazuka.value
+        this.mint(brazuka)
     }
 
     render() {
@@ -103,7 +120,9 @@ class App extends Component {
                             </li>
                         </ul>
                         <span className="navbar-text">
-                            {this.state.account}
+                            <a>
+                                { this.state.account ? this.state.account : "Connect MetaMask 🦊"}
+                            </a>
                         </span>
                     </div>
                 </nav>
@@ -114,25 +133,39 @@ class App extends Component {
                         <div className="col-12 center-block">
                             <center>    
                                 <h1 className="mb-2">Mint New NFT</h1>
-                                <form className="col-md-8 col-lg-6 text-left" onSubmit={(event) => {
-                                    event.preventDefault()
-                                    const brazuka = this.brazuka.value
-                                    this.mint(brazuka)
-                                }}>
+                                <form className="col-md-8 col-lg-6 text-left" onSubmit={this.handleSubmit}>
                                     <div className="form-group">
                                         <label htmlFor="exampleInputEmail1">NFT Path:</label>
                                         <input ref={(input) => {
                                             this.brazuka = input
                                         }} type="text" className="form-control" id="nftPath" aria-describedby="nftHelper" placeholder="Add the file location (Ex: /files/Brazukas)"></input>
-                                        <small id="emailHelp" className="form-text text-muted text-center">Metamesk must be connected for minting new NFT's</small>
+                                        <small id="emailHelp" className="form-text text-muted text-center"> Metamesk must be connected for minting new NFT's</small>
                                     </div>
 
                                     <center>
-                                        <button type="submit" className="btn btn-primary col-md-7 col-sm-12">Submit</button>
+                                        <button type="submit" className="btn btn-primary col-md-7 col-sm-12" disabled={!this.state.account} >
+                                            { this.state.account ? "Submit " : "Submit (🦊 Metamask not connected)" }
+                                        </button>
                                     </center>
 
 
                                 </form>
+                            </center>
+                        </div>
+                    </div>
+
+                    <div className="row mt-5">
+                        <div className="col-12 center-block">
+                            <center>    
+                                <h1 className="mb-2">Get NFT's list</h1>
+
+                                <button type="text" onClick={async (event) => {
+                                    event.preventDefault() 
+                                    console.log(this.state.brazukas)
+                                }} className="btn btn-primary col-3" disabled={!this.state.account}>
+                                     { this.state.account ? "Get List " : "Get List (🦊 Metamask not connected)" }
+                                </button>
+
                             </center>
                         </div>
                     </div>
