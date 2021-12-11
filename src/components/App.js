@@ -23,29 +23,39 @@ class App extends Component {
     }
 
     async loadBlochainData(){
+        if(!await this.isWalletConnected()) return
+        
         const web3 = window.web3
-        const walletIsConnected = await this.checkIfWalletIsConnected()
+        const accounts = await web3.eth.getAccounts()
         const networkId = await web3.eth.getId()
         const networkData = Brazukas.networks[networkId]
-        
-        if(walletIsConnected) {
-            const accounts = await web3.eth.getAccounts()
-            this.setState({
-                account: accounts,
-            })
-        }
+
+        this.setState({
+            account: accounts,
+        })
 
         if(networkData) {
             const abi = Brazukas.abi
-            const address = networkData
+            const address = networkData.address
             const contract = new web3.eth.Contract(abi, address)
-            this.setState({ networkData, contract })
+            this.setState({ contract })
+        } else {
+            window.alert("SmartContract not deployed")
         }
         
+        const totalSupply = await this.state.contract.methods.totalSupply().call()
+
+        for(let i=0; i < totalSupply; i++) {
+            const brazuka = await this.state.contract.methods.BrazukasArray(i).call()
+            this.setState({
+                brazukas: [...this.state.brazukas, brazuka]
+            })
+        }
+
         console.log(this.state)
     }
 
-    async checkIfWalletIsConnected(){
+    async isWalletConnected(){
         return this.state.isWalletConnected
     }
 
@@ -54,8 +64,9 @@ class App extends Component {
         this.state = {
             account: '',
             isWalletConnected: false,
-            networkData: '',
-            contract: ''
+            totalSupply: 0,
+            contract: null,
+            brazukas: []
         }
     }
 
