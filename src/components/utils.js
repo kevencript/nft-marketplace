@@ -71,6 +71,10 @@ export const loadContract = async () => {
             status: 'SmartContract not deployed'
         }
     }
+}
 
+export const listAllNFT = async () => {
+    const nftList = await window.contract.methods.BrazukasArray().call()
+    return nftList
 }
 

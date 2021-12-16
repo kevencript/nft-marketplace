@@ -2,13 +2,20 @@ import './Minter.css';
 import React, { useEffect, useState } from "react"
 import { connectWallet, mintNFT, loadContract } from '../utils'
 
-
 const Minter = () => {
     // Global States
     const [isConnected, setConnectedStatus] = useState(false)
     const [walletAddress, setWallet] = useState('')
     const [status, setStatus] = useState('')
     const [isContractLoaded, setContractIsLoaded] = useState(false)
+    const [nftList, setNftList] = useState([])
+
+   // URL IMAGES FOR TESTS 
+   // https://live.staticflickr.com/65535/51750026888_c2e4412c56.jpg 
+   // https://live.staticflickr.com/65535/51750426254_7569d0f01b.jpg
+   // https://live.staticflickr.com/65535/51750426269_97a01e572a.jpg
+   // https://live.staticflickr.com/65535/51750426279_ccf0d95d13.jpg
+   // https://live.staticflickr.com/65535/51749778701_159ac8377a.jpg
 
     // Form input
     const [nftPathToMint, setNftPathToMint] = useState('')
@@ -20,6 +27,12 @@ const Minter = () => {
                 setStatus(contractResponse.status)
                 setContractIsLoaded(contractResponse.success)
             }
+
+            // Creating a list with all NFT's
+            if(!nftList.length) {
+                await listAllNFTs()
+            }
+            
 
             try {
                 const accounts = await window.ethereum.request({ method: "eth_accounts" }) //get Metamask wallet
@@ -48,6 +61,17 @@ const Minter = () => {
         if(mintResponse.success) {
             setStatus(mintResponse.status)
         }
+    }
+
+    const listAllNFTs = async () => {
+        const totalSupply = await window.contract.methods.totalSupply().call()
+
+        for (let i=0; i < totalSupply; i++) {
+            const nft = await window.contract.methods.BrazukasArray(i).call()
+            if(nft !== nftList[i]) nftList.push(nft)
+        }
+        
+        return nftList
     }
 
     const connectWalletPressed = async () => {
@@ -97,8 +121,9 @@ const Minter = () => {
                 </div>
             </nav>
         </div>
-            <div className="containers mt-5">
-
+            <div className="container mt-5">
+                
+                {/* Mint Section  */}
                 <div className="row">
                     <div className="col-12 center-block">
                         <center>    
@@ -122,6 +147,26 @@ const Minter = () => {
                             </form>
                         </center>
                     </div>
+                </div>
+
+                {/* NFT's listing Section */}
+                <div className='row'>
+                {nftList.map((brazuka,key) => {
+                    return(
+                        <div className='col-4 mt-5' key={key}>
+                            <div className="card" style={{ width: '18rem'}}>
+                                <center>
+                                    <img src={brazuka} className="card-img-top" style={{ 'maxWidth': '96%', 'marginTop':'6px' }}></img>
+                                </center>
+                                <div className="card-body">
+                                    <h5 className="card-title">Brazuka</h5>
+                                    <p className="card-text">Brazukas are the most interesting NFT's nowadays!</p>
+                                    {/* <a href="" className="btn btn-primary">Buy Now $</a> */}
+                                </div>
+                            </div>
+                        </div>                       
+                    )
+                })}
                 </div>
             </div>
     </div>
